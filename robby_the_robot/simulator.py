@@ -40,11 +40,7 @@ class Simulation(object):
         self.pool = None
         self.current_generation = []
         self.start_timestamp = None
-
-        f = open(self.sim_params.csv_file, 'w')
-        self.csv_writer = csv.DictWriter(f,
-                                         ['Generation',
-                                          'Best Average Fitness'])
+        self.result_generations = []
 
     def run_simulation(self):
         """
@@ -58,21 +54,32 @@ class Simulation(object):
         for i in range(0, self.sim_params.num_generations):
             self.current_generation = self.pool.map(pool_worker,
                                                     self.current_generation)
-            self._sort_generation()
-            self.csv_writer.writerow({'Generation': str(i),
-                                      'Best Average Fitness':
-                                          self.current_generation[0].fitness})
+            self.result_generations.append(list(self.current_generation))
             self._create_next_generation()
 
+        self._write_results()
         print 'Finished', datetime.datetime.now() - self.start_timestamp
 
-    def _sort_generation(self):
+    def _write_results(self):
         """
-        Private method to sort the current generation by their fitness
+        Private method to write the results of the experiment
         """
-        self.current_generation = sorted(self.current_generation,
-                                         reverse=True)
+        print 'Creating results CSV...'
+        csv_writer = csv.DictWriter(
+            open(self.sim_params.csv_file, 'w'),
+            fieldnames=['Generation', 'Best Average Fitness', 'Run Time'],
+            delimiter=',', lineterminator='\n')
+        idx = 1
 
+        csv_writer.writeheader()
+
+        for gen in self.result_generations:
+            gen = sorted(gen, reverse=True)
+            csv_writer.writerow(
+                {'Generation': str(idx),
+                 'Best Average Fitness': gen[0].fitness,
+                 'Run Time': gen[0].run_time})
+            idx += 1
 
     def _init_first_generation(self):
         """
@@ -103,7 +110,7 @@ class Simulation(object):
             parent1 = tournament[0]
             parent2 = tournament[1]
 
-            child1_strategy, child2_strategy= self._crossover(
+            child1_strategy, child2_strategy = self._crossover(
                 parent1.strategy, parent2.strategy)
             # parent1.strategy = child1
             # parent2.strategy = child2
@@ -142,9 +149,9 @@ class Simulation(object):
             strategy_len = len(strategy1)
             split_point = random.randint(0, strategy_len)
             child1 = strategy1[0:split_point] + \
-                     strategy2[split_point:strategy_len]
+                strategy2[split_point:strategy_len]
             child2 = strategy2[0:split_point] + \
-                     strategy1[split_point:strategy_len]
+                strategy1[split_point:strategy_len]
         else:
             child1 = strategy1
             child2 = strategy2
@@ -158,5 +165,19 @@ class Simulation(object):
         len_strategy = len(strategy)
         for i in range(0, len_strategy):
             if random.random() < self.sim_params.mutation_rate:
-                strategy = strategy[:i] + str(random.randint(0, 9)) + strategy[i:]
+                strategy = strategy[:i] + str(random.randint(0, 9)) +\
+                    strategy[i:]
         return strategy
+
+    def _signal_handler(self, signum, frame):
+        """
+        Private method to handle CTRL-C being pressed, cleans up all process
+        pool.
+        """
+        # Terminating process pool
+        if self.pool is not None:
+            self.pool.terminate()
+
+        # Writing any results
+        if self.result_generations:
+            self._write_results()

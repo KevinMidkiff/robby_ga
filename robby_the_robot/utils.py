@@ -46,3 +46,13 @@ def generate_strategy(
         chars - List of characters to use in the string
     """
     return ''.join(random.choice(chars) for _ in range(size))
+
+
+def chunks(l, n):
+    """
+    Yield successive n-sized chunks from l.
+    """
+    chunk_list = []
+    for i in xrange(0, len(l), n):
+        chunk_list.append(list(l[i:i+n]))
+    return chunk_list

@@ -1,3 +1,4 @@
+import datetime
 from .environment import Environment
 
 
@@ -15,6 +16,7 @@ class RobbyTheRobot(object):
         self.strategy = strategy
         self.fitness = None
         self.sim_params = simulation_params
+        self.run_time = None
 
         # dictionary representing each move
         self.movement_map = [
@@ -41,6 +43,7 @@ class RobbyTheRobot(object):
         best_fitness = None
         num_iter = self.sim_params.iterations
         steps = self.sim_params.steps_per_iteration
+        start_timestamp = datetime.datetime.now()
 
         for i in range(0, num_iter):
             cur_fitness = 0
@@ -60,6 +63,9 @@ class RobbyTheRobot(object):
                 best_fitness = cur_fitness
 
         self.fitness = best_fitness
+        td = datetime.datetime.now() - start_timestamp
+        self.run_time = '{0}.{1}'.format(str(td.seconds),
+                                         str(td.microseconds).rjust(6, '0'))
 
     def __repr__(self):
         return str(self.fitness)
