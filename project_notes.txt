@@ -1,0 +1,42 @@
+Movements:
+----------
+Stay
+Move N
+Move NW
+Move W
+Move SW
+Move S
+Move SE
+Move E
+Move NE
+Pick Up
+
+
+Inputs:
+-------
+Number of generations
+Population Size
+Mutation rate
+Crossover Probability
+
+Globals:
+--------
+Number of Env per Strategy (20)
+Number of actions per env (100)
+Can density (0.5)
+Wall Penalty (5)
+Pick up penalty (1)
+can reward (+10)
+
+
+Notes:
+------
+Crossover:
+    - Loop for range 0 to half of generations
+        - Takes random sample of 15 out of the 200 individuals in the population
+        - Take two with max fitness and reproduce them (parent1, parent2)
+        - Does a crossover by with parent1 and parent2 splitting by by a random index and adding split halves from each parent
+Mutation:
+    - Loop through each number and produce a random number between 0 and 1
+    - If gen value < than mutation rate, then choose random number to place (out of options) to place in the index
+
