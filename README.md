@@ -67,4 +67,4 @@ The only requirement is Python 2.7.  Then just run robby_ga.py by giving it a JS
 
 ## License
 
-A short snippet describing the license (MIT, Apache, etc.)
+There is no license. This software is provided AS-IS with no support from the developer.
