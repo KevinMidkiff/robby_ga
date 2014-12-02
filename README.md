@@ -23,6 +23,10 @@ The simulation runs for the given amount of generations and runs each inidividua
 
 The simulation is driven from a JSON configuration file.  See the **Code Example** section below for an example.
 
+## Requirements
+
+This library requires Python 2.7.
+
 ## Code Example
 
 As mentioned above the simulation is driven off of a configuration file.  An example is shown below.
@@ -47,6 +51,11 @@ As mentioned above the simulation is driven off of a configuration file.  An exa
 }
 ```
 
+To run a configuration from the command line, simply do run the following:
+
+```sh
+$ python robby_ga.py example-config.json
+```
 
 ## Motivation
 

@@ -35,6 +35,10 @@ class Simulation(object):
         Arguments:
             <ADD DOCUMENTATION>
         """
+        # Setting up signal handlers
+        signal.signal(signal.SIGINT, self._signal_handler)
+        signal.signal(signal.SIGTERM, self._signal_handler)
+
         self.sim_params = simulation_params
         self.num_workers = num_workers
         self.pool = None
@@ -46,10 +50,11 @@ class Simulation(object):
         """
         Runs the simulation
         """
-        self.pool = mp.Pool(processes=self.num_workers)
+        self.pool = mp.Pool(processes=self.num_workers,
+                            initializer=init_worker)
         self._init_first_generation()
         self.start_timestamp = datetime.datetime.now()
-        print 'Running simulation...'
+        print('Running simulation...')
 
         for i in range(0, self.sim_params.num_generations):
             self.current_generation = self.pool.map(pool_worker,
@@ -58,13 +63,16 @@ class Simulation(object):
             self._create_next_generation()
 
         self._write_results()
-        print 'Finished', datetime.datetime.now() - self.start_timestamp
+        self.pool.close()
+        self.pool.terminate()
+        self.pool.join()
+        print('Finished', datetime.datetime.now() - self.start_timestamp)
 
     def _write_results(self):
         """
         Private method to write the results of the experiment
         """
-        print 'Creating results CSV...'
+        print('Creating results CSV...')
         csv_writer = csv.DictWriter(
             open(self.sim_params.csv_file, 'w'),
             fieldnames=['Generation', 'Best Average Fitness', 'Run Time'],
@@ -96,7 +104,7 @@ class Simulation(object):
         to it.
         """
         num_strategies = self.sim_params.population_size - 1
-        half_gen_size = self.sim_params.population_size / 2
+        half_gen_size = int(self.sim_params.population_size / 2)
 
         new_generation = []
 
@@ -174,10 +182,12 @@ class Simulation(object):
         Private method to handle CTRL-C being pressed, cleans up all process
         pool.
         """
+        # pass
         # Terminating process pool
         if self.pool is not None:
+            # if self.pool.is_alive():
             self.pool.terminate()
 
         # Writing any results
-        if self.result_generations:
-            self._write_results()
+        # if self.result_generations:
+            # self._write_results()

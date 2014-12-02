@@ -18,7 +18,7 @@ class Environment(object):
         """
         self.can_density = can_density
         self.point_system = point_system
-        self.map = [[self._has_can() for j in xrange(x)] for i in xrange(y)]
+        self.map = [[self._has_can() for j in range(x)] for i in range(y)]
         self.cur_pos = Point(0, y - 1)
 
     def _has_can(self):
