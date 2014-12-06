@@ -35,9 +35,7 @@ class Point(object):
         self.__dict__.update(state)
 
 
-def generate_strategy(
-        size=729,
-        chars=['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']):
+def generate_strategy(size, chars):
     """
     Generates a string os size, "size", composed of the characters, "chars".
 
@@ -45,4 +43,4 @@ def generate_strategy(
         size  - Size of the string to generate
         chars - List of characters to use in the string
     """
-    return ''.join(random.choice(chars) for _ in range(size))
+    return str(''.join(random.choice(chars) for _ in range(size)))

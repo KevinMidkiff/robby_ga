@@ -8,7 +8,8 @@ class SimulationParams(object):
     def __init__(self, can_reward, pickup_penalty, wall_penalty, stay_put,
                  iterations, steps_per_iter, can_density, env_x, env_y,
                  population_size, num_generations, crossover_prob,
-                 mutation_rate, tournament_size, csv_file):
+                 mutation_rate, tournament_size, repititions,
+                 experiment_name, complex):
         """
         SimulationParams constructor
 
@@ -27,7 +28,9 @@ class SimulationParams(object):
         self.crossover_prob = crossover_prob
         self.mutation_rate = mutation_rate
         self.tournament_size = tournament_size
-        self.csv_file = csv_file
+        self.repititions = repititions
+        self.experiment_name = experiment_name
+        self.complex = complex
 
     def __getstate__(self):
         """

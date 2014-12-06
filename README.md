@@ -33,6 +33,9 @@ As mentioned above the simulation is driven off of a configuration file.  An exa
 
 ```json
 {
+    "experiment_name": "example",
+    "complex": true,
+    "repititions": 5,
     "can_reward": 10,
     "pickup_penalty": 1,
     "wall_penalty": 5,
@@ -47,7 +50,6 @@ As mentioned above the simulation is driven off of a configuration file.  An exa
     "crossover_prob": 0,
     "mutation_rate": 0.05,
     "tournament_size": 15,
-    "csv_file": "example-results.csv"
 }
 ```
 

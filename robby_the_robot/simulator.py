@@ -42,9 +42,9 @@ class Simulation(object):
         self.sim_params = simulation_params
         self.num_workers = num_workers
         self.pool = None
-        self.current_generation = []
+        # self.current_generation = []
         self.start_timestamp = None
-        self.result_generations = []
+        self.gen_results = {}
 
     def run_simulation(self):
         """
@@ -52,15 +52,23 @@ class Simulation(object):
         """
         self.pool = mp.Pool(processes=self.num_workers,
                             initializer=init_worker)
-        self._init_first_generation()
         self.start_timestamp = datetime.datetime.now()
+        reps = self.sim_params.repititions
+        num_gens = self.sim_params.num_generations
+        name = self.sim_params.experiment_name
         print('Running simulation...')
 
-        for i in range(0, self.sim_params.num_generations):
-            self.current_generation = self.pool.map(pool_worker,
-                                                    self.current_generation)
-            self.result_generations.append(list(self.current_generation))
-            self._create_next_generation()
+        for i in range(0, reps):
+            print('Running Repitition:', i + 1)
+            results = []
+            curr_gen = self._init_first_generation()
+            for j in range(0, num_gens):
+                print('Running Generation:', j + 1)
+                curr_gen = self.pool.map(pool_worker, curr_gen)
+                results.append(list(curr_gen))
+                curr_gen = self._create_next_generation(curr_gen)
+            key = '{0}_run_{1}'.format(name, str(i))
+            self.gen_results[key] = list(results)
 
         self._write_results()
         self.pool.close()
@@ -73,55 +81,63 @@ class Simulation(object):
         Private method to write the results of the experiment
         """
         print('Creating results CSV...')
-        csv_writer = csv.DictWriter(
-            open(self.sim_params.csv_file, 'w'),
-            fieldnames=['Generation', 'Best Average Fitness', 'Run Time'],
-            delimiter=',', lineterminator='\n')
-        idx = 1
+        for gen_key in self.gen_results:
+            csv_writer = csv.DictWriter(
+                open(gen_key + '.csv', 'w'),
+                fieldnames=['Generation', 'Fitness'],
+                delimiter=',', lineterminator='\n')
+            idx = 1
 
-        csv_writer.writeheader()
+            csv_writer.writeheader()
 
-        for gen in self.result_generations:
-            gen = sorted(gen, reverse=True)
-            csv_writer.writerow(
-                {'Generation': str(idx),
-                 'Best Average Fitness': gen[0].fitness,
-                 'Run Time': gen[0].run_time})
-            idx += 1
+            for result in self.gen_results[gen_key]:
+                result = sorted(result, reverse=True)
+                csv_writer.writerow(
+                    {'Generation': str(idx),
+                     'Fitness': result[0].fitness})
+                idx += 1
 
     def _init_first_generation(self):
         """
         Creates the initial randomly generated generation
         """
-        for i in range(0, self.sim_params.population_size):
-            strategy = generate_strategy()
-            robby = RobbyTheRobot(self.sim_params, strategy)
-            self.current_generation.append(robby)
+        generation = []
+        if self.sim_params.complex:
+            size = 19683
+            chars = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10']
+        else:
+            size = 243
+            chars = ['0', '1', '2', '3', '4', '5', '6']
 
-    def _create_next_generation(self):
+        for i in range(0, self.sim_params.population_size):
+            strategy = generate_strategy(size, chars)
+            robby = RobbyTheRobot(self.sim_params, strategy)
+            generation.append(robby)
+        return generation
+
+    def _create_next_generation(self, curr_gen):
         """
         Private function for creating the next generation from the one given
         to it.
         """
         num_strategies = self.sim_params.population_size - 1
         half_gen_size = int(self.sim_params.population_size / 2)
+        tournament_size = self.sim_params.tournament_size
 
         new_generation = []
 
         for i in range(0, half_gen_size):
             tournament = []
 
-            for j in range(0, self.sim_params.tournament_size):
+            for j in range(0, tournament_size):
                 idx = random.randint(0, num_strategies)
-                tournament.append(self.current_generation[idx])
+                tournament.append(curr_gen[idx])
 
             parent1 = tournament[0]
             parent2 = tournament[1]
 
             child1_strategy, child2_strategy = self._crossover(
                 parent1.strategy, parent2.strategy)
-            # parent1.strategy = child1
-            # parent2.strategy = child2
 
             # Mutating the strategy
             child1_strategy = self._mutate(child1_strategy)
@@ -133,14 +149,7 @@ class Simulation(object):
             new_generation.append(child1)
             new_generation.append(child2)
 
-            # print '##########################################'
-            # print 'Parent1 strategy:\n\t', parent1.strategy
-            # print 'Parent2 strategy:\n\t', parent2.strategy
-            # print 'Child1 strategy:\n\t', child1.strategy
-            # print 'Child2s strategy:\n\t', child2.strategy
-            # print '##########################################\n'
-
-        self.current_generation = new_generation
+        return new_generation
 
     def _crossover(self, strategy1, strategy2):
         """
@@ -171,9 +180,15 @@ class Simulation(object):
         Mutates the given strategy
         """
         len_strategy = len(strategy)
+
+        if self.sim_params.complex:
+            max_idx = 10
+        else:
+            max_idx = 6
+
         for i in range(0, len_strategy):
             if random.random() < self.sim_params.mutation_rate:
-                strategy = strategy[:i] + str(random.randint(0, 9)) +\
+                strategy = strategy[:i] + str(random.randint(0, max_idx)) +\
                     strategy[i:]
         return strategy
 
@@ -182,11 +197,11 @@ class Simulation(object):
         Private method to handle CTRL-C being pressed, cleans up all process
         pool.
         """
-        # pass
+        pass
         # Terminating process pool
-        if self.pool is not None:
+        # if self.pool is not None:
             # if self.pool.is_alive():
-            self.pool.terminate()
+            # self.pool.terminate()
 
         # Writing any results
         # if self.result_generations:

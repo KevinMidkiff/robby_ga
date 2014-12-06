@@ -1,11 +1,11 @@
 {
-    "experiment_name": "example",
-    "complex": false,
+    "experiment_name": "crossover_0.5_complex",
+    "complex": true,
     "can_reward": 10,
     "pickup_penalty": 1,
     "wall_penalty": 5,
     "stay_put": 0,
-    "iterations": 5,
+    "iterations": 20,
     "steps_per_iter": 100,
     "can_density": 0.5,
     "env_x": 10,
@@ -15,5 +15,5 @@
     "crossover_prob": 0.5,
     "mutation_rate": 0.05,
     "tournament_size": 15,
-    "repititions": 5
+    "repititions": 3
 }

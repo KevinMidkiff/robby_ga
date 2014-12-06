@@ -1,5 +1,6 @@
 import datetime
 from .environment import Environment
+from .movement_maps import COMPLEX, SIMPLE
 
 
 class RobbyTheRobot(object):
@@ -19,18 +20,23 @@ class RobbyTheRobot(object):
         self.run_time = None
 
         # dictionary representing each move
-        self.movement_map = [
-            'move_north',
-            'move_northwest',
-            'move_west',
-            'move_southwest',
-            'move_south',
-            'move_southeast',
-            'move_east',
-            'move_northeast',
-            'pick_up',
-            'stay'
-        ]
+        if self.sim_params.complex:
+            self.movement_map = COMPLEX
+        else:
+            self.movement_map = SIMPLE
+
+        # self.movement_map = [
+            # 'move_north',
+            # 'move_northwest',
+            # 'move_west',
+            # 'move_southwest',
+            # 'move_south',
+            # 'move_southeast',
+            # 'move_east',
+            # 'move_northeast',
+            # 'pick_up',
+            # 'stay'
+        # ]
 
     def run(self):
         """
@@ -49,10 +55,12 @@ class RobbyTheRobot(object):
             cur_fitness = 0
             env = Environment(
                 self.sim_params.env_x, self.sim_params.env_y,
-                self.sim_params.can_density, self.sim_params.point_system)
+                self.sim_params.can_density, self.sim_params.point_system,
+                self.sim_params.complex)
 
             for j in range(0, steps):
-                movement = self.movement_map[int(self.strategy[j])]
+                move_idx = int(self.strategy[j])
+                movement = self.movement_map[move_idx]
                 move_func = getattr(env, movement)
                 cur_fitness += move_func()
 
@@ -66,9 +74,6 @@ class RobbyTheRobot(object):
         td = datetime.datetime.now() - start_timestamp
         self.run_time = '{0}.{1}'.format(str(td.seconds),
                                          str(td.microseconds).rjust(6, '0'))
-
-    def __repr__(self):
-        return str(self.fitness)
 
     def __gt__(self, other):
         """

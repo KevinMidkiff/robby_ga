@@ -11,7 +11,7 @@ def json_sim_params(json_configs):
     """
     Returns a SimulationParams object from the given JSON file
     """
-    params = [] 
+    params = []
 
     for config_file in json_configs:
         if os.path.exists(config_file):
@@ -33,7 +33,8 @@ def parse_args():
     parser.add_argument('json_configs', type=str, nargs='+',
                         help='JSON file containing the configuration '
                              'for the simulation')
-    parser.add_argument('-num-workers', dest='num_workers', default=4,
+    parser.add_argument('-num-workers', dest='num_workers', type=int,
+                        default=4,
                         help='Number of processes to use to run the '
                              'simulation')
     return parser.parse_args()

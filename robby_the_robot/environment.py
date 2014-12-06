@@ -3,13 +3,14 @@ from operator import sub as subtract
 from operator import add
 
 from .utils import Point
+from .movement_maps import COMPLEX, SIMPLE
 
 
 class Environment(object):
     """
     Class representation of an environment for Robby
     """
-    def __init__(self, x, y, can_density, point_system):
+    def __init__(self, x, y, can_density, point_system, complex_mode):
         """
         Envrionment Class constructor
 
@@ -20,6 +21,7 @@ class Environment(object):
         self.point_system = point_system
         self.map = [[self._has_can() for j in range(x)] for i in range(y)]
         self.cur_pos = Point(0, y - 1)
+        self.complex = complex_mode
 
     def _has_can(self):
         """
@@ -107,3 +109,15 @@ class Environment(object):
         Stay in current position
         """
         return self.point_system.stay_put
+
+    def random(self):
+        """
+        Decides a random action to take
+        """
+        if self.complex:
+            idx = random.randint(0, 10)
+            points = getattr(self, COMPLEX[idx])()
+        else:
+            idx = random.randint(0, 6)
+            points = getattr(self, SIMPLE[idx])()
+        return points
