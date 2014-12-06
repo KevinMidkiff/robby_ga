@@ -25,19 +25,6 @@ class RobbyTheRobot(object):
         else:
             self.movement_map = SIMPLE
 
-        # self.movement_map = [
-            # 'move_north',
-            # 'move_northwest',
-            # 'move_west',
-            # 'move_southwest',
-            # 'move_south',
-            # 'move_southeast',
-            # 'move_east',
-            # 'move_northeast',
-            # 'pick_up',
-            # 'stay'
-        # ]
-
     def run(self):
         """
         Runs the instance of Robby the Robot for in randomly generated
