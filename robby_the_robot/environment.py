@@ -2,7 +2,7 @@ import random
 from operator import sub as subtract
 from operator import add
 
-from .utils import Point
+from .point import Point
 from .movement_maps import COMPLEX, SIMPLE
 
 
