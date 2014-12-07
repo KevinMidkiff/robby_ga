@@ -1,0 +1,19 @@
+{
+    "experiment_name": "population_100_simple",
+    "complex": false,
+    "repititions": 3,
+    "can_reward": 10,
+    "pickup_penalty": 1,
+    "wall_penalty": 5,
+    "stay_put": 0,
+    "iterations": 20,
+    "steps_per_iter": 100,
+    "can_density": 0.5,
+    "env_x": 10,
+    "env_y": 10,
+    "population_size": 100,
+    "num_generations": 50,
+    "crossover_prob": 0,
+    "mutation_rate": 0.05,
+    "tournament_size": 15
+}
