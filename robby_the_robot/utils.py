@@ -10,7 +10,8 @@ def generate_strategy(size, chars):
         size  - Size of the string to generate
         chars - List of characters to use in the string
     """
-    return str(''.join(random.choice(chars) for _ in range(size)))
+    # return str(''.join(random.choice(chars) for _ in range(size)))
+    return [random.choice(chars) for _ in range(size)]
 
 
 def init_generation(sim_params):
@@ -20,10 +21,12 @@ def init_generation(sim_params):
     generation = []
     if sim_params.complex:
         size = 19683
-        chars = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10']
+        # chars = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10']
+        chars = range(11)
     else:
         size = 243
-        chars = ['0', '1', '2', '3', '4', '5', '6']
+        # chars = ['0', '1', '2', '3', '4', '5', '6']
+        chars = range(7)
 
     for i in range(0, sim_params.population_size):
         strategy = generate_strategy(size, chars)
@@ -46,13 +49,13 @@ def crossover(sim_params, strategy1, strategy2):
     if random.random() < sim_params.crossover_prob:
         strategy_len = len(strategy1)
         split_point = random.randint(0, strategy_len)
-        child1 = strategy1[0:split_point] + \
-            strategy2[split_point:strategy_len]
-        child2 = strategy2[0:split_point] + \
-            strategy1[split_point:strategy_len]
+        child1 = list(strategy1[0:split_point]) + \
+            list(strategy2[split_point:strategy_len])
+        child2 = list(strategy2[0:split_point]) + \
+            list(strategy1[split_point:strategy_len])
     else:
-        child1 = strategy1
-        child2 = strategy2
+        child1 = list(strategy1)
+        child2 = list(strategy2)
 
     return child1, child2
 
@@ -70,8 +73,9 @@ def mutate(sim_params, strategy):
 
     for i in range(0, len_strategy):
         if random.random() < sim_params.mutation_rate:
-            strategy = strategy[:i] + str(random.randint(0, max_idx)) +\
-                strategy[i:]
+            # strategy = strategy[:i] + str(random.randint(0, max_idx)) +\
+                # strategy[i:]
+            strategy[i] = random.randint(0, max_idx)
     return strategy
 
 

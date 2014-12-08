@@ -3,7 +3,7 @@ import json
 import argparse
 import traceback
 
-from robby_the_robot.simulator import Simulation
+from robby_the_robot.simulator import Simulation, run_simulation
 from robby_the_robot.simulation_params import SimulationParams
 
 
@@ -49,8 +49,9 @@ def main():
 
     try:
         for param in params:
-            simulator = Simulation(param, args.num_workers)
-            simulator.run_simulation()
+            run_simulation(param)
+            # simulator = Simulation(param, args.num_workers)
+            # simulator.run_simulation()
     except KeyboardInterrupt:
         pass
     except:

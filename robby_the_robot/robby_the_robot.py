@@ -38,16 +38,17 @@ class RobbyTheRobot(object):
         steps = self.sim_params.steps_per_iteration
         start_timestamp = datetime.datetime.now()
 
-        for i in range(0, num_iter):
+        for i in range(num_iter):
             cur_fitness = 0
             env = Environment(
                 self.sim_params.env_x, self.sim_params.env_y,
                 self.sim_params.can_density, self.sim_params.point_system,
                 self.sim_params.complex)
 
-            for j in range(0, steps):
-                move_idx = int(self.strategy[j])
-                movement = self.movement_map[move_idx]
+            for j in range(steps):
+                # move_idx = int(self.strategy[j])
+                # movement = self.movement_map[move_idx]
+                movement = self.movement_map[self.strategy[j]]
                 move_func = getattr(env, movement)
                 cur_fitness += move_func()
 

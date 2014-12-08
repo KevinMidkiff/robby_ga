@@ -1,5 +1,8 @@
 import signal
+import math
+from queue import Queue
 import multiprocessing as mp
+import time
 
 import datetime
 import csv
@@ -23,22 +26,84 @@ def pool_worker(robby):
     return robby
 
 
-def repitition_worker(sim_params):
+def repitition_worker(params):
     """
     Worker for a repitition
     """
+    rep_idx, sim_params = params
     num_gens = sim_params.num_generations
     curr_gen = utils.init_generation(sim_params)
     results = []
 
     with ThreadPoolExecutor(max_workers=4) as executor:
         for i in range(0, num_gens):
-            # print('Running Generation:', i + 1)
+            print('Repetition:', str(rep_idx), '- Generation:', str(i))
             curr_gen = list(executor.map(pool_worker, curr_gen))
             results.append(list(curr_gen))
             curr_gen = utils.create_next_generation(sim_params, curr_gen)
 
     return results
+
+
+def worker(rep_idx, sim_params, out_q):
+    num_gens = sim_params.num_generations
+    curr_gen = utils.init_generation(sim_params)
+    pool = mp.Pool(processes=8)
+    results = []
+
+    for i in range(0, num_gens):
+        start = datetime.datetime.now()
+        curr_gen = pool.map(pool_worker, curr_gen)
+        results.append(list(curr_gen))
+        curr_gen = utils.create_next_generation(sim_params, curr_gen)
+        print('Repetition', rep_idx, '- Generation', i, 'Run time',
+              datetime.datetime.now() - start)
+    out_q.put(results)
+
+
+def write_results(results, name):
+    num_results = len(results)
+    for i in range(num_results):
+        csv_name = '{0}_run_{1}.csv'.format(name, str(i))
+        csv_writer = csv.DictWriter(
+            open(csv_name, 'w'),
+            fieldnames=['Generation', 'Fitness'],
+            delimiter=',', lineterminator='\n')
+        jdx = 1
+
+        csv_writer.writeheader()
+
+        for result in results[i]:
+            result = sorted(result, reverse=True)
+            csv_writer.writerow(
+                {'Generation': str(jdx),
+                 'Fitness': result[0].fitness})
+            jdx += 1
+
+
+def run_simulation(sim_params):
+    out_q = mp.Queue()
+    num_procs = sim_params.repititions
+    start_timestamp = datetime.datetime.now()
+    procs = []
+
+    print('Running experiment:', sim_params.experiment_name)
+
+    # Starting processes
+    for i in range(num_procs):
+        p = mp.Process(
+            target=worker,
+            args=(i, sim_params, out_q))
+        procs.append(p)
+        p.start()
+
+    results = []
+    for i in range(num_procs):
+        results.append(out_q.get())
+
+    print('Writing results to CSV...')
+    write_results(results, sim_params.experiment_name)
+    print('Finished', datetime.datetime.now() - start_timestamp)
 
 
 class Simulation(object):
@@ -67,14 +132,13 @@ class Simulation(object):
         Runs the simulation
         """
         self.pool = mp.Pool(processes=self.num_workers,
-                            initializer=init_worker,
-                            maxtasksperchild=10)
+                            initializer=init_worker)
         self.start_timestamp = datetime.datetime.now()
         reps = self.sim_params.repititions
         params = []
 
         for i in range(0, reps):
-            params.append(self.sim_params)
+            params.append((i+1, self.sim_params))
 
         print('Running simulation...')
         self.gen_results = self.pool.map(repitition_worker, params)
