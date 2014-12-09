@@ -15,7 +15,12 @@ class Environment(object):
         Envrionment Class constructor
 
         Arguments:
-            <ADD DOCUMENTATION>
+             x            - X dimension of the X by Y grid
+             y            - Y dimension of the X by Y grid
+             can_density  - Density of cans in the generated environment
+             point_system - PointSystem object to use for the returning the
+                            score for making a specific movement in the
+                            environment
         """
         self.can_density = can_density
         self.point_system = point_system
@@ -54,8 +59,6 @@ class Environment(object):
             self.cur_pos = position
         except (IndexError, AssertionError):
             # Ran into wall
-            # print 'Error:', e
-            # print 'Position:', position
             points = -self.point_system.wall_penalty
         return points
 

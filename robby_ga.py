@@ -3,7 +3,7 @@ import json
 import argparse
 import traceback
 
-from robby_the_robot.simulator import Simulation, run_simulation
+from robby_the_robot.simulator import run_simulation
 from robby_the_robot.simulation_params import SimulationParams
 
 

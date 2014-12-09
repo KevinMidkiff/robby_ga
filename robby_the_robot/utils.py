@@ -21,11 +21,9 @@ def init_generation(sim_params):
     generation = []
     if sim_params.complex:
         size = 19683
-        # chars = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10']
         chars = range(11)
     else:
         size = 243
-        # chars = ['0', '1', '2', '3', '4', '5', '6']
         chars = range(7)
 
     for i in range(0, sim_params.population_size):

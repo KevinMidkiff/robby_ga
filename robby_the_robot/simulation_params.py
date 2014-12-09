@@ -14,7 +14,28 @@ class SimulationParams(object):
         SimulationParams constructor
 
         Arguments:
-            <TODO - Add documentation>
+            can_reward      - Number of points to reward for picking up a can
+            pickup_penalty  - Number of points to deduct for trying to pick up
+                              a can in an empty square
+            wall_penalty    - Number of points to deduct for running into the
+                              wall
+            stay_put        - Number of points to deduct for staying put
+            iterations      - Number of iterations to run each Robby
+            steps_per_iter  - Number of steps to run each Robby in the current
+                              environment
+            can_density     - Density of cans in the environment
+            env_x           - X dimension of the environment grid
+            env_y           - Y dimension of the environment grid
+            population_size - Number of Robby’s in each generation
+            num_generations -   Number of generations to run the simulation
+            crossover_prob  - Probability of two strategies to be crossed over
+            mutation_rate   - The probability of each action in a strategy to
+                              be mutated
+            tournament_size - Size of the tournament to select parents from
+            repititions     - Number of repetitions to run each simulation
+            experiment_name - Name of the simulation
+            complex         - Boolean value for which movement map to use
+
         """
         self.point_system = PointSystem(can_reward, pickup_penalty,
                                         wall_penalty, stay_put)
